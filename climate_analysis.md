@@ -20,30 +20,34 @@ Plot the results using the DataFrame plot method.
 
 
 ```python
-# Python SQL toolkit and Object Relational Mapper
-import sqlalchemy
-from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-```
-
-
-```python
+# All dependency
 import pandas as pd
-import os
-import matplotlib.pyplot as plt
 import numpy as np
+import json
+import matplotlib.pyplot as plt
+import requests as req
 import seaborn as sns
 from datetime import datetime, date, timedelta
 from  matplotlib.ticker import FuncFormatter
 import matplotlib.patches as mpatches
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy.orm import Session
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy import extract
+from sqlalchemy import func, desc
+import pymysql
+pymysql.install_as_MySQLdb()
  
 ```
 
 
 ```python
-# Create engine using the `hawaii.sqlite` database file
-engine = create_engine("sqlite:///hawaii.sqlite")
+#Use SQLAlchemy create_engine to connect to your already created/saved data,  sqlite database.
+#engine = create_engine("sqlite:///hawaii.sqlite")
+engine = create_engine("sqlite:///dropna_hawaii.sqlite")
 ```
 
 
@@ -136,7 +140,7 @@ len(mylist)
 
 
 
-    2230
+    2021
 
 
 
@@ -149,7 +153,7 @@ engine
 
 
 
-    <sqlalchemy.engine.base.Connection at 0x1a11e24668>
+    <sqlalchemy.engine.base.Connection at 0x1a1eddfb00>
 
 
 
@@ -372,11 +376,11 @@ plt.show()
 ```
 
 
-    <matplotlib.figure.Figure at 0x1a11e639b0>
+    <matplotlib.figure.Figure at 0x1a1d63fef0>
 
 
 
-![png](climate_analysis_files/climate_analysis_21_1.png)
+![png](climate_analysis_files/climate_analysis_20_1.png)
 
 
 # Station Analysis
@@ -458,14 +462,14 @@ Active_stations
 
 
     [('USC00519281', 'WAIHEE 837.5, HI US', '2017-08-18', 2772),
-     ('USC00519397', 'WAIKIKI 717.2, HI US', '2017-08-23', 2724),
-     ('USC00513117', 'KANEOHE 838.1, HI US', '2017-07-31', 2709),
-     ('USC00519523', 'WAIMANALO EXPERIMENTAL FARM, HI US', '2017-08-23', 2669),
-     ('USC00516128', 'MANOA LYON ARBO 785.2, HI US', '2017-08-23', 2612),
-     ('USC00514830', 'KUALOA RANCH HEADQUARTERS 886.9, HI US', '2017-08-23', 2202),
-     ('USC00511918', 'HONOLULU OBSERVATORY 702.2, HI US', '2015-10-30', 1979),
-     ('USC00517948', 'PEARL CITY, HI US', '2017-07-31', 1372),
-     ('USC00518838', 'UPPER WAHIAWA 874.3, HI US', '2015-11-20', 511)]
+     ('USC00513117', 'KANEOHE 838.1, HI US', '2017-07-31', 2696),
+     ('USC00519397', 'WAIKIKI 717.2, HI US', '2017-08-23', 2685),
+     ('USC00519523', 'WAIMANALO EXPERIMENTAL FARM, HI US', '2017-08-23', 2572),
+     ('USC00516128', 'MANOA LYON ARBO 785.2, HI US', '2017-08-23', 2484),
+     ('USC00514830', 'KUALOA RANCH HEADQUARTERS 886.9, HI US', '2017-08-23', 1937),
+     ('USC00511918', 'HONOLULU OBSERVATORY 702.2, HI US', '2015-10-30', 1932),
+     ('USC00517948', 'PEARL CITY, HI US', '2017-07-28', 683),
+     ('USC00518838', 'UPPER WAHIAWA 874.3, HI US', '2015-10-20', 342)]
 
 
 
@@ -718,7 +722,7 @@ plt.show()
 ```
 
 
-![png](climate_analysis_files/climate_analysis_36_0.png)
+![png](climate_analysis_files/climate_analysis_35_0.png)
 
 
 # Temperature Analysis
@@ -781,7 +785,6 @@ tobs_date
      ('2010-01-02', 63),
      ('2010-01-03', 74),
      ('2010-01-04', 76),
-     ('2010-01-06', 73),
      ('2010-01-07', 70),
      ('2010-01-08', 64),
      ('2010-01-09', 68),
@@ -803,10 +806,8 @@ tobs_date
      ('2010-01-26', 76),
      ('2010-01-27', 68),
      ('2010-01-28', 72),
-     ('2010-01-30', 70),
      ('2010-01-31', 67),
      ('2010-02-01', 66),
-     ('2010-02-03', 67),
      ('2010-02-04', 69),
      ('2010-02-05', 67),
      ('2010-02-06', 67),
@@ -820,7 +821,6 @@ tobs_date
      ('2010-02-15', 71),
      ('2010-02-16', 61),
      ('2010-02-17', 69),
-     ('2010-02-19', 63),
      ('2010-02-20', 64),
      ('2010-02-21', 65),
      ('2010-02-22', 67),
@@ -838,7 +838,6 @@ tobs_date
      ('2010-03-07', 72),
      ('2010-03-08', 69),
      ('2010-03-09', 70),
-     ('2010-03-11', 73),
      ('2010-03-12', 72),
      ('2010-03-13', 73),
      ('2010-03-14', 70),
@@ -849,7 +848,6 @@ tobs_date
      ('2010-03-22', 69),
      ('2010-03-23', 68),
      ('2010-03-24', 74),
-     ('2010-03-26', 72),
      ('2010-03-27', 72),
      ('2010-03-28', 73),
      ('2010-03-29', 74),
@@ -899,7 +897,6 @@ tobs_date
      ('2010-05-17', 77),
      ('2010-05-18', 76),
      ('2010-05-19', 77),
-     ('2010-05-21', 77),
      ('2010-05-22', 78),
      ('2010-05-23', 75),
      ('2010-05-24', 77),
@@ -953,7 +950,6 @@ tobs_date
      ('2010-07-11', 78),
      ('2010-07-12', 77),
      ('2010-07-13', 80),
-     ('2010-07-16', 78),
      ('2010-07-17', 76),
      ('2010-07-18', 77),
      ('2010-07-19', 77),
@@ -1059,7 +1055,6 @@ tobs_date
      ('2010-10-31', 76),
      ('2010-11-01', 75),
      ('2010-11-02', 73),
-     ('2010-11-04', 73),
      ('2010-11-05', 77),
      ('2010-11-06', 76),
      ('2010-11-07', 77),
@@ -1071,7 +1066,6 @@ tobs_date
      ('2010-11-13', 76),
      ('2010-11-16', 73),
      ('2010-11-17', 73),
-     ('2010-11-19', 72),
      ('2010-11-20', 69),
      ('2010-11-21', 69),
      ('2010-11-22', 68),
@@ -1101,7 +1095,6 @@ tobs_date
      ('2010-12-19', 71),
      ('2010-12-23', 70),
      ('2010-12-24', 70),
-     ('2010-12-26', 74),
      ('2010-12-27', 74),
      ('2010-12-28', 71),
      ('2010-12-29', 75),
@@ -1118,7 +1111,6 @@ tobs_date
      ('2011-01-09', 58),
      ('2011-01-10', 73),
      ('2011-01-11', 60),
-     ('2011-01-13', 68),
      ('2011-01-14', 76),
      ('2011-01-15', 68),
      ('2011-01-16', 66),
@@ -1146,7 +1138,6 @@ tobs_date
      ('2011-02-08', 71),
      ('2011-02-09', 71),
      ('2011-02-10', 71),
-     ('2011-02-12', 68),
      ('2011-02-13', 68),
      ('2011-02-14', 72),
      ('2011-02-15', 70),
@@ -1167,7 +1158,6 @@ tobs_date
      ('2011-03-04', 72),
      ('2011-03-05', 69),
      ('2011-03-06', 70),
-     ('2011-03-08', 72),
      ('2011-03-09', 71),
      ('2011-03-10', 71),
      ('2011-03-12', 72),
@@ -1267,7 +1257,6 @@ tobs_date
      ('2011-06-19', 75),
      ('2011-06-20', 76),
      ('2011-06-21', 76),
-     ('2011-06-24', 77),
      ('2011-06-25', 78),
      ('2011-06-26', 76),
      ('2011-06-27', 77),
@@ -1363,7 +1352,6 @@ tobs_date
      ('2011-10-01', 78),
      ('2011-10-02', 78),
      ('2011-10-03', 80),
-     ('2011-10-05', 79),
      ('2011-10-06', 75),
      ('2011-10-07', 78),
      ('2011-10-08', 79),
@@ -1607,8 +1595,6 @@ tobs_date
      ('2012-06-05', 77),
      ('2012-06-06', 76),
      ('2012-06-07', 78),
-     ('2012-06-08', 77),
-     ('2012-06-09', 76),
      ('2012-06-10', 77),
      ('2012-06-11', 76),
      ('2012-06-12', 76),
@@ -1638,7 +1624,6 @@ tobs_date
      ('2012-07-06', 78),
      ('2012-07-07', 76),
      ('2012-07-08', 77),
-     ('2012-07-09', 77),
      ('2012-07-10', 76),
      ('2012-07-11', 76),
      ('2012-07-12', 76),
@@ -1678,8 +1663,6 @@ tobs_date
      ('2012-08-15', 79),
      ('2012-08-16', 78),
      ('2012-08-17', 78),
-     ('2012-08-18', 77),
-     ('2012-08-19', 76),
      ('2012-08-20', 79),
      ('2012-08-21', 77),
      ('2012-08-22', 77),
@@ -1777,6 +1760,27 @@ tobs_date
      ('2012-11-22', 69),
      ('2012-11-23', 71),
      ('2012-11-24', 69),
+     ('2012-11-25', 74),
+     ('2012-11-26', 72),
+     ('2012-11-27', 74),
+     ('2012-11-28', 65),
+     ('2012-11-29', 67),
+     ('2012-11-30', 65),
+     ('2012-12-01', 65),
+     ('2012-12-02', 71),
+     ('2012-12-03', 76),
+     ('2012-12-04', 70),
+     ('2012-12-05', 76),
+     ('2012-12-08', 69),
+     ('2012-12-09', 74),
+     ('2012-12-10', 76),
+     ('2012-12-11', 74),
+     ('2012-12-12', 73),
+     ('2012-12-13', 73),
+     ('2012-12-14', 74),
+     ('2012-12-15', 73),
+     ('2012-12-16', 73),
+     ('2012-12-17', 73),
      ...]
 
 
@@ -1836,8 +1840,8 @@ tobs_date_df.head()
     </tr>
     <tr>
       <th>4</th>
-      <td>2010-01-06</td>
-      <td>73</td>
+      <td>2010-01-07</td>
+      <td>70</td>
     </tr>
   </tbody>
 </table>
@@ -1900,8 +1904,8 @@ tobs_date_df.head()
     </tr>
     <tr>
       <th>4</th>
-      <td>2010-01-06</td>
-      <td>73</td>
+      <td>2010-01-07</td>
+      <td>70</td>
     </tr>
   </tbody>
 </table>
@@ -1944,10 +1948,251 @@ calc_temps("2017-03-10", "2017-03-20")
 ```
 
 
-![png](climate_analysis_files/climate_analysis_43_0.png)
+![png](climate_analysis_files/climate_analysis_42_0.png)
 
 
-    The trip average temperature is: 71.82089552238806 degrees
+    The trip average temperature is: 71.64406779661017 degrees
     The trip max temperature is: 82 degrees
     The trip minimum temperature is: 65 degrees
+
+
+# Optional Recommended Analysis
+The following are optional challenge queries. These are highly recommended to attempt, but not required for the homework.
+
+1) Calcualte the rainfall per weather station using the previous year's matching dates.
+2) Calculate the daily normals. Normals are the averages for min, avg, and max temperatures.
+
+Create a function called daily_normals that will calculate the daily normals for a specific date. This date string will be in the format %m-%d. Be sure to use all historic tobs that match that date string.
+Create a list of dates for your trip in the format %m-%d. Use the daily_normals function to calculate the normals for each date string and append the results to a list.
+Load the list of daily normals into a Pandas DataFrame and set the index equal to the date.
+Use Pandas to plot an area plot (stacked=False) for the daily normals.
+
+
+
+```python
+#Calcualte the rainfall per weather station using the previous year's matching dates.
+number_station = session.query(measurement.station, func.sum(measurement.prcp).label('rainfall')).\
+                 filter(measurement.date.between('2016-08-23', '2017-08-23')).\
+                 group_by(measurement.station).\
+                 order_by(desc('rainfall')).all()
+    
+    
+number_station 
+```
+
+
+
+
+    [('USC00516128', 147.81000000000006),
+     ('USC00519281', 70.03000000000003),
+     ('USC00513117', 48.510000000000026),
+     ('USC00519523', 38.01),
+     ('USC00514830', 33.239999999999995),
+     ('USC00519397', 16.089999999999986),
+     ('USC00517948', 4.59)]
+
+
+
+
+```python
+type(measurement.prcp)
+```
+
+
+
+
+    sqlalchemy.orm.attributes.InstrumentedAttribute
+
+
+
+
+```python
+#Create a function called `daily_normals` that will calculate the daily normals for a specific date. 
+#This date string will be in the format `%m-%d`. Be sure to use all historic tobs that match that date string.
+
+def daily_normals(chosen_date):
+    
+    record = str(chosen_date).split('-')
+    chosen_month = record[0]
+    chosen_day = record[1]
+    
+    results = session.query(func.min(measurement.tobs), func.avg(measurement.tobs), func.max(measurement.tobs)).\
+               filter((extract('month', measurement.date)==chosen_month) and (extract('day', measurement.date)==chosen_day)).\
+               group_by(measurement.station).all()
+        
+    date_daily_normal_df = pd.DataFrame(results[:], columns=['Min_Temp', 'Avg_Temp', 'Max_Temp'])
+         
+    T_min = date_daily_normal_df["Min_Temp"].mean()
+    T_avg = date_daily_normal_df["Avg_Temp"].mean()
+    T_max = date_daily_normal_df["Max_Temp"].mean()
+    
+    
+    return(T_min, T_avg, T_max)
+
+
+ 
+```
+
+
+```python
+#Create a list of dates for your trip in the format `%m-%d`. Use the `daily_normals` function to calculate the 
+#normals for each date string and append the results to a list.
+#Load the list of daily normals into a Pandas DataFrame and set the index equal to the date.
+
+chosen_date_tmin_list = []
+chosen_date_tavg_list = []
+chosen_date_tmax_list = []
+
+chosen_date_list = ['1-2','2-17','3-23', '7-04', '10-14', '5-24', '9-10']
+
+for chosen_date in chosen_date_list:
+    
+    min_temp, avg_temp, max_temp = daily_normals(chosen_date)
+    
+    chosen_date_tmin_list.append(min_temp)
+    chosen_date_tavg_list.append(avg_temp)
+    chosen_date_tmax_list.append(max_temp)
+next
+info_data = {"Date": chosen_date_list, "T_Min": chosen_date_tmin_list, "T_Avg": chosen_date_tavg_list, "T_Max": chosen_date_tmax_list}
+info_df = pd.DataFrame(info_data)
+info_df.set_index('Date', inplace=True, )
+info_df
+```
+
+
+
+
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>T_Avg</th>
+      <th>T_Max</th>
+      <th>T_Min</th>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1-2</th>
+      <td>68.881903</td>
+      <td>78.333333</td>
+      <td>57.333333</td>
+    </tr>
+    <tr>
+      <th>2-17</th>
+      <td>69.579099</td>
+      <td>79.111111</td>
+      <td>59.222222</td>
+    </tr>
+    <tr>
+      <th>3-23</th>
+      <td>69.946996</td>
+      <td>78.888889</td>
+      <td>60.000000</td>
+    </tr>
+    <tr>
+      <th>7-04</th>
+      <td>75.909180</td>
+      <td>82.666667</td>
+      <td>69.222222</td>
+    </tr>
+    <tr>
+      <th>10-14</th>
+      <td>75.347900</td>
+      <td>82.777778</td>
+      <td>67.777778</td>
+    </tr>
+    <tr>
+      <th>5-24</th>
+      <td>73.753177</td>
+      <td>81.111111</td>
+      <td>66.222222</td>
+    </tr>
+    <tr>
+      <th>9-10</th>
+      <td>76.171867</td>
+      <td>84.000000</td>
+      <td>69.222222</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
+#Use Pandas to plot an area plot (`stacked=False`) for the daily normals.
+info_df.plot(kind='area', stacked=False, alpha=0.5, colormap='Spectral')
+plt.show()
+```
+
+
+![png](climate_analysis_files/climate_analysis_48_0.png)
+
+
+
+```python
+#Create a function called `daily_normals` that will calculate the daily normals for a specific date. with sqlalchhemy session
+
+special_date_list = ['1-2','2-17','3-23', '7-04', '10-14', '5-24', '9-10']
+
+stmt = session.query(func.min(measurement.tobs).label("Min Temp"),
+                     func.max(measurement.tobs).label("Max Temp"),
+                     func.avg(measurement.tobs).label("Avg Temp")).\
+                     filter(func.strftime("%m-%d", measurement.date)=='12-20').\
+                     group_by(measurement.date).all()
+stmt
+```
+
+
+
+
+    [(68, 73, 71.16666666666667),
+     (70, 74, 71.57142857142857),
+     (65, 71, 69.66666666666667),
+     (69, 79, 72.75),
+     (72, 81, 76.5),
+     (72, 75, 73.6),
+     (73, 77, 75.5)]
+
+
+
+
+```python
+special_date_list = ['1-2','2-17','3-23', '7-04', '10-14', '5-24', '9-10']
+
+stmt = session.query(func.min(measurement.tobs).label("Min-Temp"),
+                     func.max(measurement.tobs).label("Max-Temp"),
+                     func.avg(measurement.tobs).label("Avg-Temp")).\
+                     filter(func.strftime("%m-%d", measurement.date)=='12-20').\
+                     group_by(measurement.date).subquery()
+stmt
+```
+
+
+
+
+    <sqlalchemy.sql.selectable.Alias at 0x1a1f446c50; %(112193727568 anon)s>
+
 
